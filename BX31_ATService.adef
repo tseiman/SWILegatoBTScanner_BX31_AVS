@@ -1,0 +1,35 @@
+executables:
+{
+	bx31_atservice = ( BX31_ATServiceComponent )
+}
+
+processes:
+{
+	envVars:
+	{
+		LE_LOG_LEVEL = DEBUG
+	}
+
+	run:
+	{
+		( bx31_atservice )
+	}
+
+	maxCoreDumpFileBytes: 512K
+	maxFileBytes: 512K
+}
+requires:
+{
+    device:
+    {
+        [rw]    /dev/ttyHS0    /dev/ttyHS0
+    }
+}
+
+version: 1.0.0
+maxFileSystemBytes: 512K
+
+bindings:
+{
+    bx31_atservice.BX31_ATServiceComponent.le_atClient -> atService.le_atClient
+}

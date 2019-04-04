@@ -1,0 +1,14 @@
+requires:
+{
+	api:
+	{
+		le_atClient = atServices/le_atClient.api
+	}
+}
+
+sources:
+{
+	main.c
+	BX31_ATServiceComponent.c
+BTStationManager.c
+}
