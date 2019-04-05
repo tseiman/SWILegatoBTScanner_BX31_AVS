@@ -30,7 +30,8 @@ static le_mem_PoolRef_t bTStationContainerPool = NULL;
 // FIXME not sure we should put this function here 
 // - could be also in BX31_ATServiceComponent.c
 
-int btScanCmp (BTScanResult_t * scanResult1, BTScanResult_t * scanResult2) {
+int btScanCmp (BTScanResult_t * scanResult1, BTScanResult_t * scanResult2)
+{
 	if (scanResult1->btStationAddress != scanResult2->btStationAddress)
 		return 1;
 	if (scanResult1->addrType != scanResult2->addrType)
@@ -52,7 +53,8 @@ int btScanCmp (BTScanResult_t * scanResult1, BTScanResult_t * scanResult2) {
 
 
 
-void initBtManager () {
+void initBtManager ()
+{
 
 	LE_DEBUG ("initializing BTStationManager");
 
@@ -73,7 +75,8 @@ void initBtManager () {
 
 }
 
-void updateList (BTScanResult_t * scanResult) {
+void updateList (BTScanResult_t * scanResult)
+{
 
 	if (stationHashMap == NULL || bTStationContainerPool == NULL)
 		initBtManager ();
