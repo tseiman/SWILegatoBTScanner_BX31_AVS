@@ -26,7 +26,8 @@ typedef struct  {
 	uint8_t addrType;
 	int rssi;
 	int data_len;
-	char advertData[MAX_BT_DATA_STRING_SIZE];  // Fixed buffer no allocation for simplicity - need to take care it is not copied more than MAX_BT_DATA_STRING_SIZE
+	char advertData[MAX_BT_DATA_STRING_SIZE];  // Fixed buffer no allocation for simplicity -
+                                               // need to take care it is not copied more than MAX_BT_DATA_STRING_SIZE
 } BTScanResult_t;
 
 
@@ -34,7 +35,6 @@ void initBLE(void (*callbackOnScan)(int, BTScanResult_t*));
 void stopBLE();
 le_atClient_CmdRef_t getCmdRef();
 void ScanBLE(le_timer_Ref_t timerRef);
-
 
 #endif /* BX31_ATSERVICECOMPONENT_H_ */
 
