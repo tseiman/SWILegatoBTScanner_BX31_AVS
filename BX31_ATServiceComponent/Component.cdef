@@ -1,8 +1,15 @@
+
+cflags:
+{
+// -DDEBUG_BX31=1
+// -DDEBUG_MAIN=1
+}
 requires:
 {
 	api:
 	{
-		le_atClient = atServices/le_atClient.api
+		atServices/le_atClient.api
+		airVantage/le_avdata.api
 	}
 }
 
@@ -10,5 +17,6 @@ sources:
 {
 	main.c
 	BX31_ATServiceComponent.c
-BTStationManager.c
+	BTStationManager.c
+	AVSInterface.c
 }

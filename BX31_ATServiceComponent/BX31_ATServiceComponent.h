@@ -11,14 +11,11 @@
 #ifndef BX31_ATSERVICECOMPONENT_H_
 #define BX31_ATSERVICECOMPONENT_H_
 
-
 #define MAX_SCANNED_STATION_MEM_POOL_SIZE 1024
 #define MAX_BT_DATA_STRING_SIZE 31				// BT Advert Packet is not longer than 31 bytes
 
 #define BX31_BT_PUBLIC_ADDR 0
 #define BX31_BT_PRIVATE_ADDR 1
-
-// #define DEBUG 1
 
 
 typedef struct  {
@@ -31,10 +28,10 @@ typedef struct  {
 } BTScanResult_t;
 
 
-void initBLE(void (*callbackOnScan)(int, BTScanResult_t*));
-void stopBLE();
-le_atClient_CmdRef_t getCmdRef();
-void ScanBLE(le_timer_Ref_t timerRef);
+void bx31at_initBLE(void (*callbackOnScan)(int, BTScanResult_t*));
+void bx31at_stopBLE();
+le_atClient_CmdRef_t bx31at_getCmdRef();
+void bx31at_ScanBLE(le_timer_Ref_t timerRef);
 
 #endif /* BX31_ATSERVICECOMPONENT_H_ */
 

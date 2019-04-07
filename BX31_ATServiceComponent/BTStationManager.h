@@ -13,6 +13,7 @@
 #define BTSTATIONMANAGER_H_
 
 #define MAX_BT_STATION_HASHMAP_SIZE 600
+#define MAX_BT_STATION_AGE 12                 // FIXME - this age of 2min is a bit low - just for demo
 
 typedef struct  {
 	uint64_t btStationAddress;		// redundant storage of the btStationAddress (here and in scanResult)
@@ -23,7 +24,9 @@ typedef struct  {
 	BTScanResult_t *scanResult;		// here the BT Scan result pointer is stored
 } BT_Station_Container_t;
 
-void initBtManager();
-void updateList(BTScanResult_t *scanResult);
+void btmgr_init();
+void btmgr_updateList(BTScanResult_t *scanResult);
+void btmgr_periodicalCheck();
+void btmgr_destroy();
 
 #endif /* BTSTATIONMANAGER_H_ */

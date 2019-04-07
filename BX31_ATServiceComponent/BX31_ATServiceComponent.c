@@ -54,7 +54,7 @@ le_mem_PoolRef_t scannedBTStationsPool;
  * -------------------------------------------------------------------------
  */
 
-void initBLE(void (*callbackOnScan) (int, BTScanResult_t *))
+void bx31at_initBLE(void (*callbackOnScan) (int, BTScanResult_t *))
 {
 
         char buffer[LE_ATDEFS_RESPONSE_MAX_BYTES];
@@ -195,7 +195,7 @@ void initBLE(void (*callbackOnScan) (int, BTScanResult_t *))
  * Stops the BX31 AT Service, releases all resources
  * -------------------------------------------------------------------------
  */
-void stopBLE()
+void bx31at_stopBLE()
 {
         LE_INFO("Stopping BX_AT");
         LE_ASSERT(le_atClient_Delete(cmdRef) == LE_OK);
@@ -210,7 +210,7 @@ void stopBLE()
  */
 // FIXME timer and command reference could be better isolated
 
-le_atClient_CmdRef_t getCmdRef()
+le_atClient_CmdRef_t bx31at_getCmdRef()
 {
         return cmdRef;
 }
@@ -226,7 +226,7 @@ le_atClient_CmdRef_t getCmdRef()
  * ------------------------------------------------------------------------
  */
 
-uint64_t btAddrToInt(char *addrStr)
+uint64_t bx31at_btAddrToInt(char *addrStr)
 {
 
         uint64_t result = 0;
@@ -260,8 +260,10 @@ uint64_t btAddrToInt(char *addrStr)
                 result |= (uint64_t) oct[i] << (CHAR_BIT * i);
         }
 
+#ifdef DEBUG_BX31
         LE_DEBUG("Converted address string \"%s\" to int: \"%012llx\"", addrStr,
                  result);
+#endif  /* DEBUG_BX31 */
 
         return result;
 }
@@ -279,7 +281,7 @@ uint64_t btAddrToInt(char *addrStr)
  * -------------------------------------------------------------------------
  */
 
-int escapedAdvrtStr2Binary(char *escapedStrIn, char *dstBuffer)
+int bx31at_escapedAdvrtStr2Binary(char *escapedStrIn, char *dstBuffer)
 {
 
         if (escapedStrIn == NULL) {
@@ -294,10 +296,12 @@ int escapedAdvrtStr2Binary(char *escapedStrIn, char *dstBuffer)
             '\"')
                 escapedStrIn[strnlen(escapedStrIn, MAX_BT_DATA_STRING_SIZE * 3 + 1) - 1] = 0; // remove tailing quote if present
 
+#ifdef DEBUG_BX31
         LE_DEBUG("got ESC str: %s", escapedStrIn);
 
         LE_DEBUG("ESC strLen: %d",
                  strnlen(escapedStrIn, MAX_BT_DATA_STRING_SIZE * 3 + 1));
+#endif /* DEBUG_BX31 */
 
         int numberOfEscapedCharacters = 0;
 
@@ -320,7 +324,7 @@ int escapedAdvrtStr2Binary(char *escapedStrIn, char *dstBuffer)
                     (char)strtol(escapedStrIn + (i * 3) + 1, NULL, 16);
         }
 
-#ifdef DEBUG
+#ifdef DEBUG_BX31
         char dbgBuffer[MAX_BT_DATA_STRING_SIZE * 5 + 1];
         memset(dbgBuffer, 0, MAX_BT_DATA_STRING_SIZE * 5 + 1);
         for (int i = 0; i < numberOfEscapedCharacters; ++i) {
@@ -328,9 +332,8 @@ int escapedAdvrtStr2Binary(char *escapedStrIn, char *dstBuffer)
         }
         LE_DEBUG("packed buffer: %s", dbgBuffer);
 
-#endif                                /* DEBUG */
-
         LE_DEBUG("converted %d chars", numberOfEscapedCharacters);
+#endif                                /* DEBUG_BX31 */
 
         return numberOfEscapedCharacters;
 }
@@ -350,7 +353,7 @@ int escapedAdvrtStr2Binary(char *escapedStrIn, char *dstBuffer)
  *
  * -------------------------------------------------------------------------
  */
-BTScanResult_t *tokenizeScanResult(char *buffer)
+BTScanResult_t *bx31at_tokenizeScanResult(char *buffer)
 {
 
         if (strncmp(buffer, "+SRBLESCAN: ", 12) != 0) {
@@ -373,7 +376,7 @@ BTScanResult_t *tokenizeScanResult(char *buffer)
 
         char *parameter = strtok(buffer + 12, ",");                             // get the first parameter (BT address) from the
                                                                                 // unsolicited string
-        if ((scanResult->btStationAddress = btAddrToInt(parameter)) == 0) {
+        if ((scanResult->btStationAddress = bx31at_btAddrToInt(parameter)) == 0) {
 
                 LE_ERROR("Problem to tokenize BL Scan String , "
                                 "could not extract BL Address");
@@ -424,7 +427,7 @@ BTScanResult_t *tokenizeScanResult(char *buffer)
                 le_mem_Release(scanResult);
                 return NULL;
         }
-        scanResult->data_len = escapedAdvrtStr2Binary(parameter, scanResult->advertData);
+        scanResult->data_len = bx31at_escapedAdvrtStr2Binary(parameter, scanResult->advertData);
 
         return scanResult;
 }
@@ -442,7 +445,7 @@ BTScanResult_t *tokenizeScanResult(char *buffer)
  *
  * ------------------------------------------------------------------------
  */
-void ScanBLE(le_timer_Ref_t timerRef)
+void bx31at_ScanBLE(le_timer_Ref_t timerRef)
 {
 
         char buffer[LE_ATDEFS_RESPONSE_MAX_BYTES];
@@ -475,7 +478,7 @@ void ScanBLE(le_timer_Ref_t timerRef)
                 while (res == LE_OK) {
                         if (callback != NULL) {
                                 BTScanResult_t *scanResult =
-                                    tokenizeScanResult(buffer);
+                                    bx31at_tokenizeScanResult(buffer);
                                 callback(intNumber, scanResult);
                         } else {
                                 LE_WARN("BT Callback NOT SET - got BT Scan  %d: %s",
