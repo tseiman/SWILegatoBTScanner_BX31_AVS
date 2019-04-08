@@ -14,7 +14,7 @@ static le_hashmap_Ref_t stationHashMap = NULL;
 static le_mem_PoolRef_t bTStationContainerPool = NULL;
 
 
-
+static unsigned int lastSeenStations = 0;
 
 /** ------------------------------------------------------------------------
  *
@@ -196,10 +196,15 @@ void btmgr_periodicalCheck()  {
         }
 
         LE_INFO("BT station statistics: Stations in list=%u; "
-                        "After cleanup=%u; removed Stations=%u",
-                        stationCount,  stationCount-removedStations, removedStations );
+                        "After cleanup=%u; removed Stations=%u; added stations=%u",
+                        stationCount,  stationCount-removedStations, removedStations,
+                        (( stationCount - lastSeenStations) > 0) ?
+                                        stationCount - lastSeenStations : 0 );  // are there stations added ? then print the number
+                                                                                // otherwise we don't print negative number
+// TODO - put here the Update to AVS !!!!
 
 
+        lastSeenStations = stationCount;
 
 }
 
