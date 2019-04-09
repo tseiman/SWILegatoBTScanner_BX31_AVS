@@ -11,5 +11,6 @@
 
 #define AVS_BASE_PATH "BTScan"
 #define AVS_STATISTICS_PATH AVS_BASE_PATH ".stats"
+#define AVS_STATION_PATH AVS_BASE_PATH ".station"
 
 #endif /* CONFIG_SCANNER_H_ */

@@ -48,9 +48,9 @@ void main_addDataToAvsCallback(char *path, void *data, avsService_DataType_t typ
  */
 
 void main_pushDataToAvsCallback() {
-
+#ifndef TEST_DRYRUN
         avsService_pushData();
-
+#endif
 }
 
 
@@ -112,6 +112,7 @@ static void main_SigHandler(int signal) {
 COMPONENT_INIT {
         char buffer[LE_ATDEFS_RESPONSE_MAX_BYTES];
         memset(buffer, 0, LE_ATDEFS_RESPONSE_MAX_BYTES);
+
 
         LE_INFO("Start BX31_ATService");
 

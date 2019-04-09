@@ -15,6 +15,7 @@
 
 #define MAX_BT_STATION_HASHMAP_SIZE 600
 #define MAX_BT_STATION_AGE 12                 // FIXME - this age of 2min is a bit low - just for demo
+#define MAX_PATH_BUFFER_LEN 1024
 
 typedef struct  {
 	uint64_t btStationAddress;		// redundant storage of the btStationAddress (here and in scanResult)

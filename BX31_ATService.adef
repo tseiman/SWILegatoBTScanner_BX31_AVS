@@ -21,6 +21,7 @@ processes:
 }
 requires:
 {
+
     device:
     {
         [rw]    /dev/ttyHS0    /dev/ttyHS0
@@ -30,7 +31,7 @@ requires:
 
 version: 1.0.0
 maxFileSystemBytes: 512K
-
+maxMemoryBytes: 120000K
 bindings:
 {
     bx31_atservice.BX31_ATServiceComponent.le_atClient -> atService.le_atClient

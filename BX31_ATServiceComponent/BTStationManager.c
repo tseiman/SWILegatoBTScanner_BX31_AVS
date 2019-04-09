@@ -9,6 +9,7 @@
 #include "BX31_ATServiceComponent.h"
 #include "BTStationManager.h"
 #include "config_scanner.h"
+#include "base64.h"
 
 
 static le_hashmap_Ref_t stationHashMap = NULL;
@@ -124,6 +125,7 @@ void btmgr_updateList (BTScanResult_t * scanResult)
                         LE_DEBUG ("No update on scan result for addr: %012llx", // are equal the new one is removed from memory
                                         scanResult->btStationAddress);
 #endif /* DEBUG_BT */
+                        sCont->isDirty = false;
                         le_mem_Release (scanResult);
                 } else {
 #ifdef DEBUG_BT
@@ -133,7 +135,7 @@ void btmgr_updateList (BTScanResult_t * scanResult)
                         le_mem_Release (sCont->scanResult);                     // in case the scan result has changed for one BT
                         // address and they are not equal we remove the old
 
-
+                        sCont->isDirty = true;
                         sCont->scanResult = scanResult;                         // and store the new in the BT_Station_Container_t
                 }
 
@@ -153,7 +155,7 @@ void btmgr_updateList (BTScanResult_t * scanResult)
 
 
                 sCont->btStationAddress = scanResult->btStationAddress;
-                sCont->isDirty = false;
+                sCont->isDirty = true;
 
                 sCont->lastSeen = le_clk_GetAbsoluteTime ();                    // storing the new scanned device to the HasMap
 
@@ -176,6 +178,9 @@ void btmgr_periodicalCheck()  {
         const uint64_t *nextKey;
         BT_Station_Container_t *nextVal;
         unsigned int stationCount = 0, removedStations = 0;
+        char pathBuffer[MAX_PATH_BUFFER_LEN];
+        char encodedStringBuffer[LE_BASE64_ENCODED_SIZE(MAX_BT_DATA_STRING_SIZE) + 1];
+
 
         LE_INFO("checking periodically BT station List");
 
@@ -197,7 +202,38 @@ void btmgr_periodicalCheck()  {
                         le_mem_Release(nextVal);
                         le_hashmap_Remove(stationHashMap, nextKey);
                         ++removedStations;
+                } else  {
+                        snprintf(pathBuffer, MAX_PATH_BUFFER_LEN, AVS_STATION_PATH ".%012llx.lastseen", nextVal->btStationAddress);
+                        avsDataAddCallback(pathBuffer, &nextVal->lastSeen, INT);
+
+                        snprintf(pathBuffer, MAX_PATH_BUFFER_LEN, AVS_STATION_PATH ".%012llx.rssi", nextVal->btStationAddress);
+                        avsDataAddCallback(pathBuffer, &nextVal->scanResult->rssi, INT);
+
+                        if(nextVal->isDirty) {
+                                snprintf(pathBuffer, MAX_PATH_BUFFER_LEN, AVS_STATION_PATH ".%012llx.addrType", nextVal->btStationAddress);
+                                avsDataAddCallback(pathBuffer, &nextVal->scanResult->addrType, INT);
+
+                                snprintf(pathBuffer, MAX_PATH_BUFFER_LEN, AVS_STATION_PATH ".%012llx.dataLen", nextVal->btStationAddress);
+                                avsDataAddCallback(pathBuffer, &nextVal->scanResult->data_len, INT);
+
+
+                                unsigned int len = LE_BASE64_ENCODED_SIZE(MAX_BT_DATA_STRING_SIZE) + 1;
+                                memset(encodedStringBuffer,0,len);
+
+                                le_result_t b64result = le_base64_Encode((uint8_t * ) nextVal->scanResult->advertData ,nextVal->scanResult->data_len,encodedStringBuffer,&len);
+
+                                if(b64result == LE_OK) {
+                                        snprintf(pathBuffer, MAX_PATH_BUFFER_LEN, AVS_STATION_PATH ".%012llx.data", nextVal->btStationAddress);
+                                        avsDataAddCallback(pathBuffer, encodedStringBuffer, STRING);
+
+                                } else {
+                                        LE_WARN("could not convert binary to base64: %d", b64result);
+                                }
+
+                        }
+
                 }
+
 
                 ++stationCount;
         }
