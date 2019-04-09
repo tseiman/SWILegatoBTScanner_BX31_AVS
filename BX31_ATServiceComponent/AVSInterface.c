@@ -63,18 +63,29 @@ le_result_t avsService_recordData(char *path, void *data, avsService_DataType_t 
         default:  LE_ERROR("Invalid Data Type"); return LE_FAULT; break;
         }
 
+        if(recordResult != LE_OK) {
+                LE_WARN("Failed to push data to record result was : %d", recordResult);
+                return recordResult;
+        }
 
 
-        if (le_avdata_PushRecord(avsRecordRef, PushRecordCallbackHandler, NULL) == LE_OK) {
+
+
+        return LE_OK;
+}
+
+le_result_t avsService_pushData() {
+        le_result_t result = LE_OK;
+        if ((result= le_avdata_PushRecord(avsRecordRef, PushRecordCallbackHandler, NULL)) == LE_OK) {
                 le_avdata_DeleteRecord(avsRecordRef);
                 avsRecordRef = NULL;
         } else {
                 LE_WARN("Failed pushing time series, will retry next time");
 
         }
-
-        return LE_OK;
+        return result;
 }
+
 
 void avsService_detroy() {
         if(avsRecordRef) le_avdata_DeleteRecord(avsRecordRef);

@@ -24,6 +24,7 @@ requires:
     device:
     {
         [rw]    /dev/ttyHS0    /dev/ttyHS0
+        [rw]    /dev/ttyUSB1    /dev/ttyUSB1
     }
 }
 

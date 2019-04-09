@@ -21,8 +21,9 @@ typedef enum {
 } avsService_DataType_t;
 
 
-le_result_t initAvsService();
-le_result_t avsService_recordData();
+le_result_t avsService_init();
+le_result_t avsService_recordData(char *path, void *data, avsService_DataType_t type);
+le_result_t avsService_pushData();
 void avsService_detroy();
 
 #endif /* AVSINTERFACE_H_ */

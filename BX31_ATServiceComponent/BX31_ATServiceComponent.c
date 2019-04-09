@@ -34,7 +34,7 @@ static le_atClient_CmdRef_t cmdRef;
 static int fd = 0;                                                              // BX31 (Module UART1) serial device file descriptor
 
 
-static void (*callback) (int, BTScanResult_t *) = NULL;                         // this callback is called in case a BT scan was
+static callbackOnScan_t callback = NULL;                                        // this callback is called in case a BT scan was
                                                                                 // received from AT CLI
 
 
@@ -54,8 +54,7 @@ le_mem_PoolRef_t scannedBTStationsPool;
  * -------------------------------------------------------------------------
  */
 
-void bx31at_initBLE(void (*callbackOnScan) (int, BTScanResult_t *))
-{
+void bx31at_initBLE(callbackOnScan_t callbackOnScan) {
 
         char buffer[LE_ATDEFS_RESPONSE_MAX_BYTES];
         memset(buffer, 0, LE_ATDEFS_RESPONSE_MAX_BYTES);
@@ -63,14 +62,14 @@ void bx31at_initBLE(void (*callbackOnScan) (int, BTScanResult_t *))
         LE_INFO("Initializing BX31 AT interface");
 
         LE_ASSERT((scannedBTStationsPool =
-                   le_mem_CreatePool("BX31_ATService.station.scan",
+                   le_mem_CreatePool("stationScan",
                                      sizeof(BTScanResult_t))) != NULL);
         le_mem_ExpandPool(scannedBTStationsPool,
                           MAX_SCANNED_STATION_MEM_POOL_SIZE);
 
         callback = callbackOnScan;
 
-        fd = le_tty_Open("/dev/ttyHS0", O_RDWR | O_NDELAY
+        fd = le_tty_Open(BX31_SERIAL_DEVICE, O_RDWR | O_NDELAY
                                                 | O_NOCTTY | O_NONBLOCK);       // opening the UART2 - which is connected to the
         if (fd == -1) {                // IoT Board
                 LE_ERROR("failed to open UART device");
@@ -195,11 +194,11 @@ void bx31at_initBLE(void (*callbackOnScan) (int, BTScanResult_t *))
  * Stops the BX31 AT Service, releases all resources
  * -------------------------------------------------------------------------
  */
-void bx31at_stopBLE()
-{
+void bx31at_stopBLE() {
         LE_INFO("Stopping BX_AT");
         LE_ASSERT(le_atClient_Delete(cmdRef) == LE_OK);
         le_tty_Close(fd);                                                       // Close the serial file descriptor
+        callback = NULL;
 }
 
 /** ------------------------------------------------------------------------
@@ -210,8 +209,7 @@ void bx31at_stopBLE()
  */
 // FIXME timer and command reference could be better isolated
 
-le_atClient_CmdRef_t bx31at_getCmdRef()
-{
+le_atClient_CmdRef_t bx31at_getCmdRef() {
         return cmdRef;
 }
 
@@ -226,8 +224,7 @@ le_atClient_CmdRef_t bx31at_getCmdRef()
  * ------------------------------------------------------------------------
  */
 
-uint64_t bx31at_btAddrToInt(char *addrStr)
-{
+uint64_t bx31at_btAddrToInt(char *addrStr) {
 
         uint64_t result = 0;
 
@@ -281,8 +278,7 @@ uint64_t bx31at_btAddrToInt(char *addrStr)
  * -------------------------------------------------------------------------
  */
 
-int bx31at_escapedAdvrtStr2Binary(char *escapedStrIn, char *dstBuffer)
-{
+int bx31at_escapedAdvrtStr2Binary(char *escapedStrIn, char *dstBuffer) {
 
         if (escapedStrIn == NULL) {
                 LE_ERROR("NULL pointer given for escaped string ");
@@ -353,8 +349,7 @@ int bx31at_escapedAdvrtStr2Binary(char *escapedStrIn, char *dstBuffer)
  *
  * -------------------------------------------------------------------------
  */
-BTScanResult_t *bx31at_tokenizeScanResult(char *buffer)
-{
+BTScanResult_t *bx31at_tokenizeScanResult(char *buffer) {
 
         if (strncmp(buffer, "+SRBLESCAN: ", 12) != 0) {
                 LE_ERROR("The given buffer seems not to contain a BX31 scan result, "

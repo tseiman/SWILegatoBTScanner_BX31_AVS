@@ -8,11 +8,14 @@
 
 #include "BX31_ATServiceComponent.h"
 #include "BTStationManager.h"
+#include "config_scanner.h"
 
 
 static le_hashmap_Ref_t stationHashMap = NULL;
 static le_mem_PoolRef_t bTStationContainerPool = NULL;
 
+static callbackOnAvsDataAdd_t avsDataAddCallback = NULL;
+static callbackOnAvsDataPush_t avsDataPushCallback = NULL;
 
 static unsigned int lastSeenStations = 0;
 
@@ -61,12 +64,11 @@ int btmgr_ScanCmp (BTScanResult_t * scanResult1, BTScanResult_t * scanResult2)
  * ------------------------------------------------------------------------
  */
 
-void btmgr_init ()
-{
+void btmgr_init(callbackOnAvsDataAdd_t callbackOnAvsDataAdd, callbackOnAvsDataPush_t callbackOnAvsDataPush) {
 
         LE_DEBUG ("initializing BTStationManager");
 
-        LE_ASSERT ((stationHashMap = le_hashmap_Create ("BT Station Table",
+        LE_ASSERT ((stationHashMap = le_hashmap_Create ("BX31_ATService.station.hashtable",
                         MAX_BT_STATION_HASHMAP_SIZE,
                         le_hashmap_HashUInt64,
                         le_hashmap_EqualsUInt64))
@@ -75,12 +77,13 @@ void btmgr_init ()
         le_hashmap_MakeTraceable (stationHashMap);
 
         bTStationContainerPool =
-                        le_mem_CreatePool ("BX31_ATService.station.container",
+                        le_mem_CreatePool ("stationContainer",
                                         sizeof (BT_Station_Container_t));
         le_mem_ExpandPool (bTStationContainerPool,
                         MAX_SCANNED_STATION_MEM_POOL_SIZE);
 
-
+        avsDataAddCallback = callbackOnAvsDataAdd;
+        avsDataPushCallback = callbackOnAvsDataPush;
 }
 
 /** ------------------------------------------------------------------------
@@ -97,8 +100,8 @@ void btmgr_init ()
 void btmgr_updateList (BTScanResult_t * scanResult)
 {
 
-        if (stationHashMap == NULL || bTStationContainerPool == NULL)
-                btmgr_init ();
+//        if (stationHashMap == NULL || bTStationContainerPool == NULL)
+//                btmgr_init ();
 
         if (le_hashmap_ContainsKey(stationHashMap, 
                         &scanResult->btStationAddress)) {
@@ -117,14 +120,16 @@ void btmgr_updateList (BTScanResult_t * scanResult)
 
 
                 if (btmgr_ScanCmp (sCont->scanResult, scanResult) == 0) {           // in case the old and the new scan result
+#ifdef DEBUG_BT
                         LE_DEBUG ("No update on scan result for addr: %012llx", // are equal the new one is removed from memory
                                         scanResult->btStationAddress);
-
+#endif /* DEBUG_BT */
                         le_mem_Release (scanResult);
                 } else {
+#ifdef DEBUG_BT
                         LE_DEBUG ("Scan result for addr: %012llx updated",
                                         scanResult->btStationAddress);
-
+#endif /* DEBUG_BT */
                         le_mem_Release (sCont->scanResult);                     // in case the scan result has changed for one BT
                         // address and they are not equal we remove the old
 
@@ -134,8 +139,10 @@ void btmgr_updateList (BTScanResult_t * scanResult)
 
         } else {
 
-                LE_DEBUG ("HashMap did not contain addr: %012llx - adding entry",
+#ifdef DEBUG_BT
+                LE_DEBUG("HashMap did not contain addr: %012llx - adding entry",
                                 scanResult->btStationAddress);
+#endif /* DEBUG_BT */
 
                 BT_Station_Container_t *sCont;
                 LE_ASSERT ((sCont = le_mem_ForceAlloc (bTStationContainerPool)) // storage for the BT station container (which contains
@@ -195,16 +202,28 @@ void btmgr_periodicalCheck()  {
                 ++stationCount;
         }
 
-        LE_INFO("BT station statistics: Stations in list=%u; "
-                        "After cleanup=%u; removed Stations=%u; added stations=%u",
-                        stationCount,  stationCount-removedStations, removedStations,
-                        (( stationCount - lastSeenStations) > 0) ?
-                                        stationCount - lastSeenStations : 0 );  // are there stations added ? then print the number
-                                                                                // otherwise we don't print negative number
+        unsigned int stationsAfterCleanup =  stationCount-removedStations;
+        unsigned int stationsAdded =  ( stationCount - lastSeenStations) > 0 ? // are there stations added ? then print the
+                        stationCount - lastSeenStations : 0;                    // number - otherwise we don't print negative number
+
+        LE_INFO("BTstat: Stations in list=%u; "
+                        "After cleanup=%u; removed Stations=%u; added stations=%u; last seen=%u",
+                        stationCount,  stationsAfterCleanup, removedStations,
+                        stationsAdded, lastSeenStations);
+
 // TODO - put here the Update to AVS !!!!
 
+        if(avsDataAddCallback != NULL) {
+                avsDataAddCallback(AVS_STATISTICS_PATH ".stations.count", &stationCount, INT);
+                avsDataAddCallback(AVS_STATISTICS_PATH ".stations.countAfterCleanup", &stationsAfterCleanup, INT);
+                avsDataAddCallback(AVS_STATISTICS_PATH ".stations.removed", &removedStations, INT);
+                avsDataAddCallback(AVS_STATISTICS_PATH ".stations.added", &stationsAdded, INT);
+                avsDataPushCallback();
+        } else  {
+                LE_WARN("callback not set, can't record data: %s", AVS_STATISTICS_PATH ".*" );
+        }
 
-        lastSeenStations = stationCount;
+        lastSeenStations = stationsAfterCleanup;
 
 }
 
@@ -232,6 +251,6 @@ void btmgr_destroy() {
 
         }
         le_hashmap_RemoveAll(stationHashMap);
-
+        avsDataAddCallback = NULL;
 }
 

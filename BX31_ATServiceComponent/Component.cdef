@@ -3,6 +3,8 @@ cflags:
 {
 // -DDEBUG_BX31=1
 // -DDEBUG_MAIN=1
+// -DDEBUG_BT=1
+
 }
 requires:
 {

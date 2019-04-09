@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 #include "le_atClient_interface.h"
+#include "le_avdata_interface.h"
 
 #ifdef __cplusplus
 }

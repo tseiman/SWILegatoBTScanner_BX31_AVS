@@ -8,6 +8,7 @@
 
 
 #include "BX31_ATServiceComponent.h"
+#include "AVSInterface.h"
 
 #ifndef BTSTATIONMANAGER_H_
 #define BTSTATIONMANAGER_H_
@@ -24,7 +25,11 @@ typedef struct  {
 	BTScanResult_t *scanResult;		// here the BT Scan result pointer is stored
 } BT_Station_Container_t;
 
-void btmgr_init();
+typedef void (*callbackOnAvsDataAdd_t)(char *path, void *data, avsService_DataType_t type);
+typedef void (*callbackOnAvsDataPush_t)();
+
+
+void btmgr_init(callbackOnAvsDataAdd_t callbackOnAvsDataAdd, callbackOnAvsDataPush_t callbackOnAvsDataPush);
 void btmgr_updateList(BTScanResult_t *scanResult);
 void btmgr_periodicalCheck();
 void btmgr_destroy();
