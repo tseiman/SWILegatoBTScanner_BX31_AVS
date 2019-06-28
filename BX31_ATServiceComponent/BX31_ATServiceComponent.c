@@ -61,6 +61,21 @@ void bx31at_initBLE(callbackOnScan_t callbackOnScan) {
 
         LE_INFO("Initializing BX31 AT interface");
 
+
+
+#ifdef __CDT_PARSER__
+#define GPIO_BX_ENABLE_ACTIVE_HIGH 0    // this is a workaround for the eclipse environment - not to highlight
+#define GPIO_BX_FWFLASH_ACTIVE_LOW 1    // the auto generated Macros as error or undefined
+#endif
+
+#ifndef RUN_BX_ON_USB
+        gpio_bx_enable_SetPushPullOutput(GPIO_BX_ENABLE_ACTIVE_HIGH, false);    // the BX31 IoT board can be controlled via GPIO Pins
+        gpio_bx_fwFlash_SetPushPullOutput(GPIO_BX_FWFLASH_ACTIVE_LOW, false);   // GPIO 2 =  gpio_bx_enable switches the board/on off. It can be used for reset
+        sleep(0.2);                                                             // GPIO 42 =  gpio_bx_fwFlash can be used to flash the FW.
+        gpio_bx_enable_Activate();                                              // here we initialize the GPIOs correctly and reset the IoT Card
+        sleep(2);
+#endif /* RUN_BX_ON_USB */
+
         LE_ASSERT((scannedBTStationsPool =
                    le_mem_CreatePool("stationScan",
                                      sizeof(BTScanResult_t))) != NULL);
@@ -199,6 +214,7 @@ void bx31at_stopBLE() {
         LE_ASSERT(le_atClient_Delete(cmdRef) == LE_OK);
         le_tty_Close(fd);                                                       // Close the serial file descriptor
         callback = NULL;
+        gpio_bx_enable_Deactivate();
 }
 
 /** ------------------------------------------------------------------------

@@ -6,7 +6,7 @@
 			<provider-reference id="org.eclipse.cdt.core.ReferencedProjectsLanguageSettingsProvider" ref="shared-provider"/>
 			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
 			<provider-reference id="com.swi.ebs.legato.core.provider.LegatoFrameworkProvider" ref="shared-provider"/>
-			<provider class="com.swi.ebs.legato.core.toolchain.LegatoGCCBuiltinSpecsDetector" console="false" env-hash="-213629170723083722" id="com.swi.ebs.legato.core.provider.GCCBuiltinSpecsDetector" keep-relative-paths="false" name="Legato Linux GCC Built-in Compiler Settings" parameter="${LegatoLinuxToolchainBinPath}/${LegatoLinuxToolchainPrefix}${COMMAND} ${LegatoLinuxToolchainSysrootArg} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
+			<provider class="com.swi.ebs.legato.core.toolchain.LegatoGCCBuiltinSpecsDetector" console="false" env-hash="-577262955575689732" id="com.swi.ebs.legato.core.provider.GCCBuiltinSpecsDetector" keep-relative-paths="false" name="Legato Linux GCC Built-in Compiler Settings" parameter="${LegatoLinuxToolchainBinPath}/${LegatoLinuxToolchainPrefix}${COMMAND} ${LegatoLinuxToolchainSysrootArg} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
 				<language-scope id="org.eclipse.cdt.core.gcc"/>
 				<language-scope id="org.eclipse.cdt.core.g++"/>
 			</provider>
@@ -19,7 +19,7 @@
 			<provider-reference id="org.eclipse.cdt.core.ReferencedProjectsLanguageSettingsProvider" ref="shared-provider"/>
 			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
 			<provider-reference id="com.swi.ebs.legato.core.provider.LegatoFrameworkProvider" ref="shared-provider"/>
-			<provider class="com.swi.ebs.legato.core.toolchain.LegatoGCCBuiltinSpecsDetector" console="false" env-hash="-213629170723083722" id="com.swi.ebs.legato.core.provider.GCCBuiltinSpecsDetector" keep-relative-paths="false" name="Legato Linux GCC Built-in Compiler Settings" parameter="${LegatoLinuxToolchainBinPath}/${LegatoLinuxToolchainPrefix}${COMMAND} ${LegatoLinuxToolchainSysrootArg} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
+			<provider class="com.swi.ebs.legato.core.toolchain.LegatoGCCBuiltinSpecsDetector" console="false" env-hash="-577262955575689732" id="com.swi.ebs.legato.core.provider.GCCBuiltinSpecsDetector" keep-relative-paths="false" name="Legato Linux GCC Built-in Compiler Settings" parameter="${LegatoLinuxToolchainBinPath}/${LegatoLinuxToolchainPrefix}${COMMAND} ${LegatoLinuxToolchainSysrootArg} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
 				<language-scope id="org.eclipse.cdt.core.gcc"/>
 				<language-scope id="org.eclipse.cdt.core.g++"/>
 			</provider>

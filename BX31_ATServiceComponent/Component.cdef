@@ -1,18 +1,21 @@
 
 cflags:
 {
-//	-DDEBUG_BX31=1
+// -DDEBUG_BX31=1
 // -DDEBUG_MAIN=1
 // -DDEBUG_BT=1
-//	-DTEST_DRYRUN=1
+// -DTEST_DRYRUN=1
+//-DRUN_BX_ON_USB=1
 }
 
 requires:
 {
 	api:
 	{
-		le_atClient = atServices/le_atClient.api 
-		le_avdata = airVantage/le_avdata.api
+		le_atClient = le_atClient.api 
+		le_avdata = le_avdata.api
+		gpio_bx_enable = le_gpio.api
+		gpio_bx_fwFlash = le_gpio.api
 	}
 }
 
@@ -22,5 +25,5 @@ sources:
 	BX31_ATServiceComponent.c
 	BTStationManager.c
 	AVSInterface.c
-base64.c
+	base64.c
 }

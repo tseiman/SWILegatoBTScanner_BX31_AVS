@@ -158,9 +158,9 @@
  * space. All asset data API will use the last namespace set until the function is called again and
  * the namespace is set to something new.
  *
- * @note All asset data paths created by the application are deleted when it is stopped, even
- * the asset data created under global namespace. No asset data can therefore be persistent after
- * an application restart, regardless of the namespace used to create it.
+ * @note Asset data settings are persistent after an application restart or device reboot,
+ * regardless of the namespace used to create it. The asset data settings are restored lazily when
+ * the app or server reads the setting.
  *
  * Example:
  *
@@ -188,7 +188,10 @@
  * An application starts by creating a path "/test/resourceA" under the default application
  * namespace and sets it to 1. Then it sets the namespace to global and creates another path
  * "/test/resourceA" with a value of 2. A read request from the server on "<appName>/test/resourceA"
- * will return 1; whereas a read request on "/test/resourceA" will return 2.
+ * will return 1; whereas a read request on "/test/resourceA" will return 2. A read request from the
+ * server on a parent node will result in reading multiple resources together. For example, a read
+ * request on "<appName>/test" will result in a response containing relative paths and values of
+ * resourceA and resourceB.
  *
  * @section le_avdata_timeseries Time Series
  *
@@ -257,6 +260,24 @@
  *
  * An invalid asset name or field name is treated as a fatal error (i.e. non-recoverable)
  * and will result in the client App being terminated.
+ *
+ * @section le_avdata_buffer AV Data Buffer Limitation
+ *
+ * The number of resources that can be read/written together is limited by the buffer size
+ * defined by avc client. There are three buffers that determines how many resources can be
+ * read/written/pushed together.
+ *
+ * - COAP_BLOCK1_SIZE - Determines the number of resource that can be written together
+ * - AVDATA_READ_BUFFER_BYTES - Determines the number of resource that can be read together
+ * - AVDATA_PUSH_BUFFER_BYTES - Determines the number of resource that can be pushed together
+ *
+ * All the buffers are set to 4096 bytes by default. Users can increase the buffer size if an
+ * application needs to operate on a parent path with a large number of resources under it.
+ *
+ * @note Having more than 5000 resources under a parent path is not advisable for
+ * several reasons: If the network is lost or device resets while the payload is being
+ * transferred, the read/write operation will fail and has to be re-triggered. Large number
+ * of settings will also slow down avc startup.
  *
  * Copyright (C) Sierra Wireless Inc.
  */
@@ -928,10 +949,11 @@ void le_avdata_ReplyExecResult
  * Push asset data to the server.
  *
  * @return:
- *      - LE_OK on success.
- *      - LE_NOT_FOUND if path doesn't exist.
- *      - LE_BUSY if push is queued and will pushed later automatically
- *      - LE_NOT_POSSIBLE if push queue is full, try again later
+ *      - LE_OK on success
+ *      - LE_NOT_FOUND if the provided path doesn't exist
+ *      - LE_BUSY if push service is busy. Data added to queue list for later push
+ *      - LE_OVERFLOW if data size exceeds the maximum allowed size
+ *      - LE_NO_MEMORY if push queue is full, try again later
  *      - LE_FAULT on any other error
  */
 //--------------------------------------------------------------------------------------------------
@@ -950,8 +972,10 @@ le_result_t le_avdata_Push
  * Push data dump to a specified path on the server.
  *
  * @return:
- *      - LE_OK on success.
- *      - LE_NOT_POSSIBLE if the service is busy pushing other data, try again later
+ *      - LE_OK on success
+ *      - LE_BUSY if push service is busy. Data added to queue list for later push
+ *      - LE_OVERFLOW if data size exceeds the maximum allowed size
+ *      - LE_NO_MEMORY if push queue is full, try again later
  *      - LE_FAULT on any other error
  */
 //--------------------------------------------------------------------------------------------------
@@ -1091,9 +1115,10 @@ le_result_t le_avdata_RecordString
  * Push record to the server
  *
  ** @return:
- *      - LE_OK on success.
- *      - LE_BUSY if push is queued and will pushed later automatically
- *      - LE_NOT_POSSIBLE if push queue is full, try again later
+ *      - LE_OK on success
+ *      - LE_BUSY if push service is busy. Data added to queue list for later push
+ *      - LE_OVERFLOW if data size exceeds the maximum allowed size
+ *      - LE_NO_MEMORY if push queue is full, try again later
  *      - LE_FAULT on any other error
  *
  * * @note If the caller is passing a bad pointer into this function, it is a fatal error, the

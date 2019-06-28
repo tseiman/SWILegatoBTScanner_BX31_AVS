@@ -24,8 +24,11 @@ requires:
 
     device:
     {
-        [rw]    /dev/ttyHS0    /dev/ttyHS0
-        [rw]    /dev/ttyUSB1    /dev/ttyUSB1
+#if ${RUN_BX_ON_USB} == 1
+      	[rw]    /dev/ttyUSB1    /dev/ttyUSB1
+#else
+		[rw]    /dev/ttyHS0    /dev/ttyHS0
+#endif
     }
 }
 
@@ -36,4 +39,7 @@ bindings:
 {
     bx31_atservice.BX31_ATServiceComponent.le_atClient -> atService.le_atClient
     bx31_atservice.BX31_ATServiceComponent.le_avdata -> avcService.le_avdata
+    bx31_atservice.BX31_ATServiceComponent.gpio_bx_fwFlash -> gpioService.le_gpioPin42
+    bx31_atservice.BX31_ATServiceComponent.gpio_bx_enable -> gpioService.le_gpioPin2
+    
 }

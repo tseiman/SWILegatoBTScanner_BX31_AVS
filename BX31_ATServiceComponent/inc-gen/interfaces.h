@@ -13,6 +13,8 @@ extern "C" {
 
 #include "le_atClient_interface.h"
 #include "le_avdata_interface.h"
+#include "gpio_bx_enable_interface.h"
+#include "gpio_bx_fwFlash_interface.h"
 
 #ifdef __cplusplus
 }

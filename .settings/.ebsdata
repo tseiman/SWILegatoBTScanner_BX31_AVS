@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LegatoProject:LegatoBinProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:LegatoProject="http://legatoProject.ecore" etpID="[Built-in] Legato for WP76 R10.1 (18.6.3.wp76xx-native-x86_64-201810311828) - WP76XX">
+<LegatoProject:LegatoBinProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:LegatoProject="http://legatoProject.ecore" etpID="[Built-in] Legato for WP76 R12 (18.10.3.wp76xx-native-x86_64-201903041326) - WP76XX">
   <configurations mbsConfigId="legato.core.af.projectType.exe.release.420666013" adefFileName="${ProjName}.adef"/>
   <configurations mbsConfigId="legato.core.af.projectType.exe.debug.1075505817" adefFileName="${ProjName}.adef"/>
 </LegatoProject:LegatoBinProject>
