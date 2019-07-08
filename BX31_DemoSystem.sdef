@@ -1,0 +1,58 @@
+
+// BX31_DemoSystem.sdef
+// This is a system definition file which defines and interconnects a system of one or more
+// applications with the target's run-time environment.
+
+// For more details on the system definition (.sdef) file format see:
+// https://docs.legato.io/latest/defFilesSdef.html
+
+
+// Include the default legato system and the platform services.
+#include $LEGATO_ROOT/default.sdef
+
+
+buildVars:
+{
+    // Declare custom variables in the build tool's process environment at build time.
+
+    // This variable can be used in other definition files for convienent access to the project's
+    // root directory.
+    DEMO_SYSTEM_DIR = $CURDIR
+}
+
+interfaceSearch:
+{
+    // Directories where interfaces are searched
+    ${DEMO_SYSTEM_DIR}/interfaces
+    ${LEGATO_ROOT}/interfaces
+    ${LEGATO_ROOT}/interfaces/airVantage
+}
+
+appSearch:
+{
+    // Directories where apps are searched
+    ${DEMO_SYSTEM_DIR}/apps
+}
+
+componentSearch:
+{
+    // Directories where components are searched
+    ${DEMO_SYSTEM_DIR}/components
+}
+
+moduleSearch:
+{
+    // Directories where kernel modules are searched
+    ${DEMO_SYSTEM_DIR}/modules
+}
+
+apps:
+{
+    // User applications.
+    BX31_ATService
+}
+
+kernelModules:
+{
+    // Kernel modules
+}

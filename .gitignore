@@ -1,2 +1,9 @@
 Target_Legato_Debug/
 Target_Legato_Release/
+
+# Ignores for VS Code Legato projects.
+_build_*/
+*.update
+
+leaf-data/
+leaf-workspace.json
