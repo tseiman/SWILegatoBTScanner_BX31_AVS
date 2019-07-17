@@ -6,11 +6,6 @@
 // For more details on the system definition (.sdef) file format see:
 // https://docs.legato.io/latest/defFilesSdef.html
 
-
-// Include the default legato system and the platform services.
-#include $LEGATO_ROOT/default.sdef
-
-
 buildVars:
 {
     // Declare custom variables in the build tool's process environment at build time.
@@ -18,7 +13,14 @@ buildVars:
     // This variable can be used in other definition files for convienent access to the project's
     // root directory.
     DEMO_SYSTEM_DIR = $CURDIR
+
+    // Configure which version of the AVC service we are using.
+    LE_CONFIG_APP_AVC_LWM2MCORE = y
 }
+
+// Include the default legato system and the platform services.
+#include $LEGATO_ROOT/default.sdef
+
 
 interfaceSearch:
 {
