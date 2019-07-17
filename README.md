@@ -6,7 +6,7 @@ Bluetooth scanner for BT advertisements on MangOH red Board with WP7607, using B
 
 First setup the Leaf environment for the project:
 
-    leaf setup -p swi-wp76_4.1.0 wp76
+    leaf setup -p swi-wp76_4.0.1 wp76
 
 This installs the Legato toolchain for the WP76 and creates a build profile named 'wp76'.
 
